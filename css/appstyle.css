@@ -1,0 +1,156 @@
+body{
+    background-color: #5fcf80;
+}
+
+
+/*************** header *************/
+h1{
+    color:#fff;
+}
+
+
+/*****Multiple Selections *************/
+/*GameBoard Boxes and player boxes in the header*/
+.boxes .box,
+.players{
+    background: #fff;
+}
+
+.error{
+    color:red;
+    font-size: 16px;
+    display: none;
+    margin: auto;
+    margin-top: 10px;
+}
+
+
+h3{
+    color: #54d17a;
+    text-shadow: 
+                -1px -1px  white,
+                1px -1px  white,
+                -1px 1px  white,
+                1px 1px  white;
+}
+
+/*************START SCREEN******************/
+#onePlayer{
+   margin-bottom: 25px;  
+}
+#oneplayerButton{
+    margin-top: 25px;
+}
+
+#onePlayer,
+#twoPlayers{
+    display: none;
+}
+
+#startGame{
+    margin-top: 50px;
+    display: none;
+}
+
+.playername{
+    margin: auto 0;
+    padding: 0;
+    padding-bottom: 2px;
+    margin-top: 10px;    
+    color: white;
+    font-size: 16px;
+}
+.input{
+    margin: auto;
+    display: block;
+    border: none;
+    padding: 10px 10px 5px 5px;
+}
+
+.button{
+    margin: auto;
+    margin-top: 10px;
+    display: block;
+    width:  35%;
+}
+
+
+.select{
+    padding-top: 10px;
+    border: none;
+}
+fieldset{
+    border: none;
+}
+.select img{
+   padding-left: 10px;
+   vertical-align: middle;
+}
+
+
+
+/********************GAME BOARD****************************/
+.svg-container{
+    margin: auto;
+    width: 78px;
+    height: 78px;
+    position: relative;
+    padding: 10px;
+}
+.svg-container svg{
+    position: absolute;
+    width: 78px;
+    height: 78px;
+}
+/*
+.x-path,
+.o-path{
+    display: none;   
+}
+*/
+#player1,
+#player2,
+h3{
+     margin: 0;
+    padding-bottom: 0;
+    padding-top: 5px;
+}
+
+.x-path{
+    fill: #690937; 
+}
+.o-path{
+     fill: blue;
+}
+
+/* pick  TODO: CHANGE COLOR*/
+/* 
+    background-color:  lightgray;
+    opacity: .1;
+*/
+
+/***********************END GAME SCREEN**********************************/
+.pick{
+    background-color:  white;
+    display:  inline-block;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 1px 1px green;
+    cursor: pointer;
+}
+
+.pick{
+    background-color:  white;
+    display:  inline-block;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 1px 1px green;
+    cursor: pointer;
+}
+
+.disable{
+    opacity: .85;
+    pointer-events: none;
+}
