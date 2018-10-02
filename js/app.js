@@ -43,6 +43,9 @@ let iconSelected = '';
 
 let isGameOver = false;
 
+let playerXColor = '#690937';
+let playerOColor = 'blue';
+
 ///PLAYER ICON
 const O = `
     <svg class="o"  xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 42 42" version="1.1">
@@ -184,49 +187,59 @@ const addSVG = () =>{
         });
     }
 }
-
 //this disaplys the gameboard and sets disaply of all SVG to none
 // and add event hadler to each list item/ box to disaply the player 'X OR O'SVG
 const gameBoardScreen = (whichButtonIsClicked) => {
     const playerO = document.querySelectorAll('.o-path');
     const playerX = document.querySelectorAll('.x-path');
-    
     playerName(whichButtonIsClicked);
     displayScreen({ activeScreen: gameBoard, inactiveScreen:[startScreen, endScreen], });
     
-     for(let box in boxes){
-        if (boxes.hasOwnProperty(box)) {
-            //remove/unundisplay all the X and O in the game board
-            playerX[box].style.display = 'none';
-            playerO[box].style.display = 'none';
-        }
-    }
-    //set the playerX
-    player1.style.background = '#690937';
+    //set the playerX color to maroon
+    setInterval(()=>{
+        //setting the color of the header in the gameboard depeding who turn it is
+        isXTurn ? playersTurn({ ActivePlayer: player1, ActiveColor:playerXColor, unactivePlayer: player2, unactiveColor: '#fff'}) 
+                : playersTurn({ ActivePlayer: player2, ActiveColor:playerOColor, unactivePlayer: player1, unactiveColor: '#fff'});
+    });
     switch(whichButtonIsClicked){
         case '1Player':
             for(let box in boxes){
-                if (boxes.hasOwnProperty(box)) {                  
-                    //player turn              
+                if (boxes.hasOwnProperty(box)) {
+                    //if player selects X the make the X Icon Visible whenplayer hovers over the gameboard
+                    //else make the O Icon visible
+                    if(iconSelected === 'X'){
+                       setInterval(() =>{
+                            //show X Icon when is players turn else dont show the X Icon 
+                            if(isXTurn){ boxes[box].addEventListener('mouseover', () => { playerO[box].classList.remove('hover'); });
+                               playersTurn({ playerSVG:playerX[box], boxInGrid: boxes[box], whantSVGHover:true});
+                            }else{  boxes[box].addEventListener('mouseover', () => { playerX[box].classList.remove('hover'); }); }                        
+                        });
+                       
+                    }else{
+                        //show O Icon when is players turn else dont show the O Icon 
+                        setInterval(() =>{
+                            if(!isXTurn){
+                                boxes[box].addEventListener('mouseover', () => { playerX[box].classList.remove('hover'); });
+                                playersTurn({ playerSVG:playerO[box], boxInGrid: boxes[box], whantSVGHover:true});
+                            }else{  boxes[box].addEventListener('mouseover', () => { playerO[box].classList.remove('hover'); }); }                        
+                        });                       
+                    }
+                       
+                    //player turn    
                     boxes[box].addEventListener('click', (e) => {                
                         switch(iconSelected){
                             case 'X':
-                                if(isXTurn) {
-                                    isXTurn = false;
-                                    switchTurns(player2, player1, '#690937', playerXPlayedSpaces, box, boxes, playerX);
-                                }
+                                if(isXTurn)
+                                  playersTurn({ playerSVG:playerX[box], boxInGrid: boxes[box], boxIndex:box, playerArray: playerXPlayedSpaces, isXTurn: false, whanSVGHover: true});
                                break;
                             case 'O':
-                                if(!isXTurn) {
-                                    isXTurn = true;
-                                    switchTurns(player2,player1, '#690937', playerOPlayedSpaces, box, boxes, playerO);
-                                }
+                                if(!isXTurn)
+                                   playersTurn({ playerSVG:playerO[box], boxInGrid: boxes[box], boxIndex:box, playerArray: playerOPlayedSpaces, isXTurn: true, whanSVGHover: true});
                                 break;
-                               
                         }
-                        // calling has won
+                        // calling who has WON
                         hasWon();
-                    });
+                    });                    
                     //computer turn
                     setInterval(()=>{ 
                         switch(iconSelected){
@@ -246,38 +259,67 @@ const gameBoardScreen = (whichButtonIsClicked) => {
                 }
             }
             break;
-        case '2Player':
-
+            
+        case '2Player':            
             for(let box in boxes){
-                if (boxes.hasOwnProperty(box)) {                    
-                    boxes[box].addEventListener('click', (e) => {                
-                        if(isXTurn){  
-                            isXTurn = false;
-                            switchTurns(player1, player2, 'blue', playerXPlayedSpaces, box, boxes, playerX);
+                if (boxes.hasOwnProperty(box)) {
+                    //make the X OR O Icon Visible when players hovers over the gameboard depending who turn it is 
+                    setInterval(() =>{
+                        if(isXTurn){
+                           boxes[box].addEventListener('mouseover', () => { playerO[box].classList.remove('hover'); });
+                           playersTurn({ playerSVG:playerX[box], boxInGrid: boxes[box], whantSVGHover:true});
+                        }else{                            
+                            boxes[box].addEventListener('mouseover', () => { playerX[box].classList.remove('hover'); });
+                            playersTurn({playerSVG:playerO[box], boxInGrid: boxes[box], whantSVGHover:true});
+                        }                        
+                    });  
+                    
+                    boxes[box].addEventListener('click', (e) => {       
+                        if(isXTurn){ 
+                            //this is player X Turn
+                            playersTurn({
+                                playerSVG:playerX[box], boxInGrid: boxes[box],
+                                boxIndex:box, playerArray: playerXPlayedSpaces, isXTurn: false                               
+                            });                            
                         }else {
-                            isXTurn = true;
-                            switchTurns(player2, player1, 'red', playerOPlayedSpaces, box, boxes, playerO);
+                            //this is player O Turn
+                            playersTurn({
+                                playerSVG:playerO[box], boxInGrid: boxes[box],
+                                boxIndex:box, playerArray: playerOPlayedSpaces, isXTurn: true                               
+                            });
                         }
-                        // calling has won
+                        // calling who has won
                         hasWon();
                     });
                 }
             }
             break;
     }
-    
 }
 
-const switchTurns = (playerUnactive, playerActive, playerColor, playedSpaces, box, boxes, player) => {
-    //set X OR O SVG display to block
-    player[box].style.display = 'block';
-    //disable this box when click
-    boxes[box].style.pointerEvents = 'none';
-    //parsing the index from string to and int then
-    //pushing index of box in to playedSpaces array
-    playedSpaces.push(parseInt(box,10));
-    playerActive.style.background = playerColor;
-    playerUnactive.style.background = '#fff';   
+const playersTurn = (playerobj) => {    
+    if(playerobj.playerSVG && playerobj.boxInGrid && playerobj.playerArray){
+        //when player clicks it should display their icon on the box they just clicked
+        playerobj.playerSVG.classList.add('display');
+        //removes the class 'remove' so when the player click the icon should be display permanently until the game ends
+        playerobj.playerSVG.classList.remove('remove');
+        // when player clicked a box disable any clicks
+        playerobj.boxInGrid.style.pointerEvents = 'none';
+        //pushing the indexof the box clicked by the player in to the player array
+        playerobj.playerArray.push(parseInt(playerobj.boxIndex,10));
+        //setting turn to true or false
+        isXTurn = playerobj.isXTurn;
+    }
+    
+    if(playerobj.whantSVGHover){
+           playerobj.boxInGrid.addEventListener('mouseover', () => { playerobj.playerSVG.classList.add('hover'); });
+           playerobj.boxInGrid.addEventListener('mouseout', () => { playerobj.playerSVG.classList.remove('hover'); });        
+    }
+        
+    if(playerobj.ActivePlayer && playerobj.unactivePlayer){
+        playerobj.ActivePlayer.style.background = playerobj.ActiveColor;
+        playerobj.unactivePlayer.style.background = playerobj.unactiveColor;
+    }
 }
 
 const computer = (playerSpace, playerArray, computer, computerColor, player, playerColor) => {
@@ -285,17 +327,17 @@ const computer = (playerSpace, playerArray, computer, computerColor, player, pla
     let randomSquare = Math.floor(Math.random() * 9);
     //when game is over stop this function from executing anything else
     if(isGameOver){ return; }
-    //gets a new random number if the original random number is alredy in 'allPlayedSpaces' array
+    //gets a new random number if the original random number is already in 'allPlayedSpaces' array
     while(allPlayedSpaces.includes(randomSquare) ){
         randomSquare = Math.floor(Math.random() * 9);
-    }
-   
+    }   
     //adds the number to 'playerArray' and add 'X OR O' to the game boad
     if(!allPlayedSpaces.includes(randomSquare)){
-         computer.style.background = computerColor;
+        computer.style.background = computerColor;
         player.style.background = playerColor;
         playerArray.push(randomSquare);
-        playerSpace[randomSquare].style.display = 'block';
+        playerSpace[randomSquare].classList.add('display');
+        playerSpace[randomSquare].classList.remove('remove');
         boxes[randomSquare].style.pointerEvents = 'none';
     }
     //check who has whon
@@ -309,12 +351,11 @@ const playerName = (whichButtonIsClicked) =>{
     switch(whichButtonIsClicked){
         case'1Player':
             iconSelected === 'X' ? addElements({ element:'h3',numberOfElements: 2,  parentElement:[XHeader, OHeader], textContent:[player1Name, player2Name] }) 
-                                 : addElements({ element:'h3',numberOfElements: 2,  parentElement:[OHeader, XHeader], textContent:[player2Name, player1Name] });                
+                                 : addElements({ element:'h3',numberOfElements: 2,  parentElement:[OHeader, XHeader], textContent:[player2Name, player1Name] });
             break;
         case '2Player': addElements({ element:'h3',numberOfElements: 2,  parentElement:[XHeader, OHeader], textContent:[player1Name, player2Name] });
             break;
     }
-
 }
 // checks who won
 const hasWon = () => {
@@ -350,7 +391,8 @@ const endGameScreen = (whoWon, hasGameEnded) => {
     if(hasGameEnded){
         displayScreen({ activeScreen: endScreen, inactiveScreen:[startScreen, gameBoard], });
         //call back function that resets and start new game
-        newGameButton.addEventListener('click', reset);         
+        newGameButton.addEventListener('click', reset);
+        //display the name of the player who has whon or show a tie Game
         switch(whoWon){
             case 'player1':
                 message.textContent = player1Name + '   WON!';
@@ -367,7 +409,6 @@ const endGameScreen = (whoWon, hasGameEnded) => {
         }       
     } 
 }
-
 //This reset the game
 const reset = () =>{
     const playerO = document.querySelectorAll('.o-path');
@@ -376,13 +417,14 @@ const reset = () =>{
      for(let box in boxes){
         if (boxes.hasOwnProperty(box)) {
             //reset everithing when player his the reset button
-            boxes[box].style.pointerEvents='';
+            boxes[box].style.pointerEvents = '';
             playerXPlayedSpaces = [];
             playerOPlayedSpaces = [];            
             displayScreen({ activeScreen: gameBoard, inactiveScreen:[startScreen, endScreen], });
             gameBoard.style.display = '';
-            playerX[box].style.display = 'none';
-            playerO[box].style.display = 'none';
+            //adds remove class so that whenthe player clicks the reset button the gameboard should be clear
+            playerX[box].classList.add('remove');
+            playerO[box].classList.add('remove');
             isXTurn = true;
             isGameOver = false;
         }
